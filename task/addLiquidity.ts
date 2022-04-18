@@ -1,19 +1,21 @@
 import { task } from "hardhat/config";
 
-task("addLiquidity", "Add liquidity to the uniswap ").addParam("contractAddr", "Address of the deployed contract")
-    .setAction(async (taskArgs, hre) => {
-        let [owner] = await hre.ethers.getSigners();
+task("addLiquidity", "Add liquidity to the uniswap ")
+    .addParam("contractAddr", "Address of the deployed contract")
+    .addParam("tokenAAddr", "Address of token", "0xEde64552FbfF05c7dc076468c3a70C6B17CB5a37")
+    .addParam("tokenBAddr", "Address of token", "0x6c798973bC66aa4556251e21058f89C942F45dC7")
+    .addParam("tokenAAmount", "Amount of token A to put into liquidity pool", "0.001")
+    .addParam("tokenBAmount", "Amount of token B to put into liquidity pool", "0.001")
 
-        const amountA = hre.ethers.utils.parseEther("1.0");
-        const amountB = hre.ethers.utils.parseEther("1.0");
+    .setAction(async (taskArgs, hre) => {
+        const amountA = hre.ethers.utils.parseEther(taskArgs['tokenAAmount']);
+        const amountB = hre.ethers.utils.parseEther(taskArgs['tokenBAmount']);
 
         const AddLiquidityContract = await hre.ethers.getContractFactory("AddLiquidity");
-        
-        const tokenAContract = await hre.ethers.getContractAt("ERC20", '0x90556C343650C3ae2e5700f139dAde3c1C9Cb82E');
-        const tokenBContract = await hre.ethers.getContractAt("ERC20", '0xfad5b47636EFC4F695343BDf31605B8bA7aA09FE');
 
-        console.log('Owner balance:', await tokenAContract.balanceOf(owner.address));
-        console.log('Approving ', amountA, 'for', taskArgs['contractAddr']);
+        const tokenAContract = await hre.ethers.getContractAt("ERC20", taskArgs['tokenAAddr']);
+        const tokenBContract = await hre.ethers.getContractAt("ERC20", taskArgs['tokenBAddr']);
+
 
         const approveATransaction = await tokenAContract.approve(taskArgs['contractAddr'], amountA);
         const approveBTransaction = await tokenBContract.approve(taskArgs['contractAddr'], amountB);
@@ -24,16 +26,18 @@ task("addLiquidity", "Add liquidity to the uniswap ").addParam("contractAddr", "
 
         const addLiquidityContract = AddLiquidityContract.attach(taskArgs['contractAddr']);
 
-
-        console.log('Allowance of token a:', await tokenAContract.allowance(owner.address, taskArgs['contractAddr']))
-        console.log('Allowance of token b:', await tokenBContract.allowance(owner.address, taskArgs['contractAddr']))
-
         const addLiquidityTransaction = await addLiquidityContract.addLiquidity(
-            tokenAContract.address, tokenBContract.address, hre.ethers.utils.parseEther("1.0"), hre.ethers.utils.parseEther("1.0")
+            tokenAContract.address, tokenBContract.address, amountA, amountB
         );
 
         const rc = await addLiquidityTransaction.wait();
 
-        console.log(`Transaction result:`, rc);
+        const newAmountAEvent = rc.events!.find(event => event.event === 'NewAmountA')!;
+        const newAmountBEvent = rc.events!.find(event => event.event === 'NewAmountB')!;
+        const newLiquidityEvent = rc.events!.find(event => event.event === 'NewLiquidity')!;
+
+
+        console.log(`New token a amount: ${newAmountAEvent.args![0]}, new token b amount: ${newAmountBEvent.args![0]}, new liquidity ${newLiquidityEvent.args![0]}`);
+
     });
 

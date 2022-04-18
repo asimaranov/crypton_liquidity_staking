@@ -26,14 +26,13 @@ contract AddLiquidity {
         ERC20(_tokenB).approve(ROUTER, _amountB);
 
         (uint256 newAmountA, uint256 newAmountB, uint256 newLiquidity) = 
-        IUniswapV2Router(ROUTER).addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, address(this), block.timestamp + 10 minutes);
+        IUniswapV2Router(ROUTER).addLiquidity(_tokenA, _tokenB, _amountA, _amountB, 0, 0, address(this), block.timestamp);
 
         emit NewAmountA(newAmountA);
         emit NewAmountB(newAmountB);
         emit NewLiquidity(newLiquidity);
 
     }
-
 
     function addLiquidityEth(
         address _tokenA,
@@ -43,7 +42,7 @@ contract AddLiquidity {
         ERC20(_tokenA).approve(ROUTER, _amountA);
 
         (uint256 newAmountA, uint256 newAmountB, uint256 newLiquidity) = 
-        IUniswapV2Router(ROUTER).addLiquidityETH{value: msg.value}(_tokenA, _amountA, 0, 0, msg.sender, block.timestamp + 10 minutes);
+        IUniswapV2Router(ROUTER).addLiquidityETH{value: msg.value}(_tokenA, _amountA, 0, 0, msg.sender, block.timestamp);
 
         emit NewAmountA(newAmountA);
         emit NewAmountB(newAmountB);

@@ -4,8 +4,10 @@ This project allows you to create liquidity pool for your tokens of add eth liqu
 
 ## AddLiquidity
 Contract addresses:
+  - Rinkeby: `0xf2Ace66af702Ecc8684C846fbF59B1D3780758D1`
   - Ropsten: `0xbe3E2DF9512d5B7e131BEf90f29FC144E6482A89`
-  - Rinkeby: `TODO`
+
+Verification: https://ropsten.etherscan.io/address/0xbe3E2DF9512d5B7e131BEf90f29FC144E6482A89#code
 
 How to deploy:
 ```shell
@@ -14,12 +16,12 @@ npx hardhat run scripts/deploy_add_liquidity.ts --network ropsten
 
 How to add liquidity for token pair:
 ```shell
-npx hardhat addLiquidity --contract-addr 0xbe3E2DF9512d5B7e131BEf90f29FC144E6482A89 --tokenAAddr 0xEde64552FbfF05c7dc076468c3a70C6B17CB5a37 --tokenBAddr 0x6c798973bC66aa4556251e21058f89C942F45dC7 --tokenAAmount 0.001 --tokenBAmount 0.001 --network ropsten
+npx hardhat addLiquidity --contract-addr 0xf2Ace66af702Ecc8684C846fbF59B1D3780758D1 --token-a-addr 0x74CdFDa0e43a11772dca104392B519b2a2C46091 --token-b-addr 0x987f78596263cDcAaA015E9221dAEbcF7309f8BF --token-a-amount 0.001 --token-b-amount 0.001 --network rinkeby
 ```
 
 How to add eth liquidity:
 ```shell
-npx hardhat addLiquidityEth --contract-addr 0xbe3E2DF9512d5B7e131BEf90f29FC144E6482A89 --tokenAddr 0xEde64552FbfF05c7dc076468c3a70C6B17CB5a37 --ethAmount 0.001 --tokenAmount 0.001 --network ropsten
+npx hardhat addLiquidityEth --contract-addr 0xf2Ace66af702Ecc8684C846fbF59B1D3780758D1 --token-addr 0x74CdFDa0e43a11772dca104392B519b2a2C46091 --eth-amount 0.001 --token-amount 0.001 --network rinkeby
 ```
 
 

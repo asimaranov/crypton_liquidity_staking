@@ -8,6 +8,7 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "./task/addLiquidity"
 import "./task/addLiquidityEth"
+import "./task/stake"
 
 dotenv.config();
 
@@ -31,14 +32,13 @@ const config: HardhatUserConfig = {
       url: process.env.ROPSTEN_RPC_URL || "",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-  
     },
     rinkeby: {
       url: process.env.RINKEBY_RPC_URL || "",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
         
-    },
+    }
 
   },
   gasReporter: {

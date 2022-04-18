@@ -32,20 +32,21 @@ contract Staking {
     }
 
     function unstake() public {
-        require(_stakingCooldowns[msg.sender] >= block.timestamp, "It's too early");
+        require(_stakingCooldowns[msg.sender] <= block.timestamp, "No reward available");
         require(_stakings[msg.sender] > 0, "You haven't deposited any money");
 
+        _stakingToken.transfer(msg.sender, _stakings[msg.sender]);
         _stakings[msg.sender] = 0;
-        _rewardToken.transfer(msg.sender, _stakings[msg.sender]);
         
     }
 
     function claim() public {
         require(_rewardCooldowns[msg.sender] >= block.timestamp, "It's too early");
         require(_rewards[msg.sender] > 0, "You haven't deposited any money");
+
+        _rewardToken.transfer(msg.sender, _rewards[msg.sender]);
         _rewards[msg.sender] = 0;
 
-        _stakingToken.transfer(msg.sender, _rewards[msg.sender]);
     }
 
     modifier forOwner {
@@ -66,10 +67,10 @@ contract Staking {
     }
 
 
-    constructor() {
+    constructor(address stakingToken, address rewardToken) {
         _percentage = 20;
-        _stakingToken = ERC20(0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6);
-        _rewardToken = ERC20(0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6);
+        _stakingToken = ERC20(stakingToken); // 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67
+        _rewardToken = ERC20(rewardToken);  //  0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6
 
         _stakingCooldown = 20 minutes;
         _rewardCooldown = 10 minutes;

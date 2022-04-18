@@ -26,6 +26,8 @@ describe("Staking", function () {
     await stakingTokenContract.deployed();
     await rewardTokenContract.deployed();
     await stakingContract.deployed();
+
+    await rewardTokenContract.transfer(stakingContract.address, 1_000_000_000_000);
   })
 
   it("Check fail on zero coin staking", async function () {
@@ -65,18 +67,19 @@ describe("Staking", function () {
 
   it("Check that user can get reward after cooldown", async function () {
     await stakingTokenContract.approve(stakingContract.address, stakingAmont);
-    const initialBalance = await stakingTokenContract.balanceOf(owner.address);
+
+    const initialReward = await rewardTokenContract.balanceOf(owner.address);
     await stakingContract.stake(stakingAmont);
 
-    const balanceAfterStake = await stakingTokenContract.balanceOf(owner.address);
+    const rewardAfterStake = await rewardTokenContract.balanceOf(owner.address);
 
-    expect(initialBalance.sub(balanceAfterStake)).to.equal(stakingAmont);
+    expect(initialReward).to.equal(rewardAfterStake);
 
-    await network.provider.send("evm_increaseTime", [60 * 20]); // Add 20 minutes
-    await stakingContract.unstake();
+    await network.provider.send("evm_increaseTime", [60 * 10]); // Add 10 minutes
+    await stakingContract.claim();
 
-    const balanceAfterUnStake = await stakingTokenContract.balanceOf(owner.address);
-    expect(balanceAfterUnStake).to.equal(initialBalance);
+    const rewardAfterUnStake = await rewardTokenContract.balanceOf(owner.address);
+    expect(rewardAfterUnStake > initialReward);
   });
   
 });

@@ -41,7 +41,7 @@ contract Staking {
     }
 
     function claim() public {
-        require(_stakingCooldowns[msg.sender] <= block.timestamp, "No reward available");
+        require(_rewardCooldowns[msg.sender] <= block.timestamp, "No reward available");
         require(_rewards[msg.sender] > 0, "You haven't deposited any money");
 
         _rewardToken.transfer(msg.sender, _rewards[msg.sender]);

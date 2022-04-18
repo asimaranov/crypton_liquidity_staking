@@ -6,7 +6,6 @@ import "./interfaces/ERC20.sol";
 
 contract AddLiquidity {
     address private constant ROUTER = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-    address private constant FACTORY = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
 
     event NewAmountA(uint256 amount);
     event NewAmountB(uint256 amount);
@@ -52,6 +51,4 @@ contract AddLiquidity {
 
     constructor () payable {
     }
-
-
 }

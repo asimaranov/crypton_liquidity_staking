@@ -35,8 +35,15 @@ describe("Staking", function () {
   it("Check that user cant unstake during cooldown", async function () {
     await stakingTokenContract.approve(stakingContract.address, stakingAmont);
     await stakingContract.stake(stakingAmont);
-    await expect(stakingContract.unstake()).to.be.revertedWith("No reward available");
+    await expect(stakingContract.unstake()).to.be.revertedWith("No tokens available");
   });
+
+  it("Check that user cant get reward during cooldown", async function () {
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+    await stakingContract.stake(stakingAmont);
+    await expect(stakingContract.claim()).to.be.revertedWith("No reward available");
+  });
+
   //             
 
   it("Check that user can unstake after cooldown", async function () {
@@ -53,8 +60,23 @@ describe("Staking", function () {
 
     const balanceAfterUnStake = await stakingTokenContract.balanceOf(owner.address);
     expect(balanceAfterUnStake).to.equal(initialBalance);
+  });
 
 
+  it("Check that user can get reward after cooldown", async function () {
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+    const initialBalance = await stakingTokenContract.balanceOf(owner.address);
+    await stakingContract.stake(stakingAmont);
+
+    const balanceAfterStake = await stakingTokenContract.balanceOf(owner.address);
+
+    expect(initialBalance.sub(balanceAfterStake)).to.equal(stakingAmont);
+
+    await network.provider.send("evm_increaseTime", [60 * 20]); // Add 20 minutes
+    await stakingContract.unstake();
+
+    const balanceAfterUnStake = await stakingTokenContract.balanceOf(owner.address);
+    expect(balanceAfterUnStake).to.equal(initialBalance);
   });
   
 });

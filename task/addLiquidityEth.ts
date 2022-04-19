@@ -5,6 +5,7 @@ task("addLiquidityEth", "Add liquidity to the uniswap ")
     .addParam("tokenAddr", "Address of token", "0xEde64552FbfF05c7dc076468c3a70C6B17CB5a37")
     .addParam("ethAmount", "Amount of eth to put into liquidity pool", "0.001")
     .addParam("tokenAmount", "Amount of token to put into liquidity pool", "0.001")
+    
     .setAction(async (taskArgs, hre) => {
 
         const amountToken = hre.ethers.utils.parseEther(taskArgs['tokenAmount']);

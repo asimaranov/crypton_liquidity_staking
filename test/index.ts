@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect, use } from "chai";
 import { assert } from "console";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { ethers, network } from "hardhat";
 
 describe("Staking", function () {
@@ -81,6 +81,45 @@ describe("Staking", function () {
     const balanceAfterUnstake = await stakingTokenContract.balanceOf(user1.address);
     expect(balanceAfterUnstake).to.equal(initialBalance);
   });
+
+  it("Check Staked event correctness", async function () {
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+
+    const stakeTransaction = await stakingContract.stake(stakingAmont);
+    const rc = await stakeTransaction.wait();
+
+    const stakedEvent = rc.events.find((e: { event: string; }) => e.event == 'Staked');
+    const [amount, until, pendingReward, rewardAvailableAt] = stakedEvent.args;
+
+    expect(amount).to.be.equal(stakingAmont);
+    expect(until.toNumber()).to.be.greaterThan(Date.now() / 1000);
+    expect(pendingReward).to.be.equal(stakingAmont * defaultPercentage / 100);
+    expect(rewardAvailableAt.toNumber()).to.be.greaterThan(Date.now() / 1000);    
+
+  });
+
+  it("Check Unstaked event correctness", async function () {
+    const newStakingCooldown = 3 * 60;  // 3 minutes
+    await stakingContract.connect(owner).setStakingCooldown(newStakingCooldown);
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+    const initialBalance = await stakingTokenContract.balanceOf(user1.address);
+    await stakingContract.stake(stakingAmont);
+
+    const balanceAfterStake = await stakingTokenContract.balanceOf(user1.address);
+
+    expect(initialBalance.sub(balanceAfterStake)).to.equal(stakingAmont);
+
+    await network.provider.send("evm_increaseTime", [newStakingCooldown]);
+    const unstakingTransaction = await stakingContract.unstake();
+
+    const rc = await unstakingTransaction.wait()
+
+    const stakedEvent = rc.events.find((e: { event: string; }) => e.event == 'Unstaked');
+    const [amount] = stakedEvent.args;
+
+    expect(amount).to.be.equal(stakingAmont);
+  });
+
 
   it("Check that user can get reward after cooldown", async function () {
     await stakingTokenContract.approve(stakingContract.address, stakingAmont);

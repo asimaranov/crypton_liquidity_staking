@@ -9,6 +9,8 @@ import "solidity-coverage";
 import "./task/addLiquidity"
 import "./task/addLiquidityEth"
 import "./task/stake"
+import "./task/unstake"
+import "./task/claim"
 
 dotenv.config();
 

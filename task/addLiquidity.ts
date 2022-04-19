@@ -6,7 +6,7 @@ task("addLiquidity", "Add liquidity to the uniswap ")
     .addParam("tokenBAddr", "Address of token", "0x6c798973bC66aa4556251e21058f89C942F45dC7")
     .addParam("tokenAAmount", "Amount of token A to put into liquidity pool", "0.001")
     .addParam("tokenBAmount", "Amount of token B to put into liquidity pool", "0.001")
-
+    
     .setAction(async (taskArgs, hre) => {
         const amountA = hre.ethers.utils.parseEther(taskArgs['tokenAAmount']);
         const amountB = hre.ethers.utils.parseEther(taskArgs['tokenBAmount']);
@@ -33,7 +33,6 @@ task("addLiquidity", "Add liquidity to the uniswap ")
         const newAmountBEvent = rc.events!.find(event => event.event === 'NewAmountB')!;
         const newLiquidityEvent = rc.events!.find(event => event.event === 'NewLiquidity')!;
         const lpTokenAddress = rc.events!.find(event => event.event === 'LPTokenAddress')!;
-
 
         console.log(`New token a amount: ${newAmountAEvent.args![0]}, new token b amount: ${newAmountBEvent.args![0]}, new liquidity ${newLiquidityEvent.args![0]}. Lp token address: ${lpTokenAddress.args![0]}`);
 

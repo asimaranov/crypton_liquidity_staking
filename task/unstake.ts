@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 
 task("unstake", "Unstake tokens")
-    .addParam("contractAddr", "Address of the deployed staking contract", "0xF37E5E828f5767732376E2AC08cd4e875BdA9639")
+    .addParam("contractAddr", "Address of the deployed staking contract", "0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6")
 
     .setAction(async (taskArgs, hre) => {
 

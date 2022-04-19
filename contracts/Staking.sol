@@ -3,7 +3,6 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/IERC20.sol";
-import "hardhat/console.sol";
 
 contract Staking {
     IERC20 private _stakingToken;

@@ -31,7 +31,7 @@ npx hardhat addLiquidityEth --contract-addr 0x533f0f27029bB7A5713F5896CD55219DF4
 
 ## Staking
 Contract addresses:
- - Rinkeby: 0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6
+ - Rinkeby: `0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6`
 
 Verification: https://rinkeby.etherscan.io/address/0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6#code
 

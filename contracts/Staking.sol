@@ -3,6 +3,7 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/ERC20.sol";
+import "hardhat/console.sol";
 
 contract Staking {
     ERC20 private _stakingToken;
@@ -32,21 +33,19 @@ contract Staking {
     }
 
     function unstake() public {
-        require(_stakingCooldowns[msg.sender] <= block.timestamp, "No tokens available");
-        require(_stakings[msg.sender] > 0, "You haven't deposited any money");
+        require(_stakings[msg.sender] > 0, "No tokens to unstake");
+        require(_stakingCooldowns[msg.sender] <= block.timestamp, "It's too early");
 
         _stakingToken.transfer(msg.sender, _stakings[msg.sender]);
         _stakings[msg.sender] = 0;
-        
     }
 
     function claim() public {
-        require(_rewardCooldowns[msg.sender] <= block.timestamp, "No reward available");
-        require(_rewards[msg.sender] > 0, "You haven't deposited any money");
+        require(_rewards[msg.sender] > 0, "No reward to claim");
+        require(_rewardCooldowns[msg.sender] <= block.timestamp, "It's too early");
 
-        _rewardToken.transfer(msg.sender, _rewards[msg.sender]);
+        _rewardToken.transferFrom(_owner, msg.sender, _rewards[msg.sender]);
         _rewards[msg.sender] = 0;
-
     }
 
     modifier forOwner {

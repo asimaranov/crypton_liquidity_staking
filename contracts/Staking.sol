@@ -10,11 +10,10 @@ contract Staking {
     IERC20 private _rewardToken;
 
     uint256 private _percentage;
-
-    address private _owner;
-
     uint256 private _stakingCooldown;
     uint256 private _rewardCooldown;
+
+    address private _owner;
 
     mapping(address => uint256) private _stakings;
     mapping(address => uint256) private _stakingCooldowns;

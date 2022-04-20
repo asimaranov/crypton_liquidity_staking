@@ -5,7 +5,13 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Staking {
-    
+
+    struct Stake{
+        uint256 staking;
+        uint256 stakingCooldown;
+        uint256 rewardCooldown;
+    }
+
     IERC20 private _stakingToken;
     IERC20 private _rewardToken;
 
@@ -16,10 +22,7 @@ contract Staking {
     uint256 private _stakingCooldown;
     uint256 private _rewardCooldown;
 
-    mapping(address => uint256) private _stakings;
-
-    mapping(address => uint256) private _stakingCooldowns;
-    mapping(address => uint256) private _rewardCooldowns;
+    mapping(address => Stake) private _stakings;
 
     event Staked(uint256 amount, uint256 until);
     event Unstaked(uint256 amount);
@@ -34,30 +37,30 @@ contract Staking {
         require(amount > 0, "Unable to stake 0 tokens");
 
         _stakingToken.transferFrom(msg.sender, address(this), amount);
-        _stakings[msg.sender] += amount;
-        _stakingCooldowns[msg.sender] = block.timestamp + _stakingCooldown;
-        _rewardCooldowns[msg.sender] = block.timestamp + _rewardCooldown;
+        _stakings[msg.sender].staking += amount;
+        _stakings[msg.sender].stakingCooldown = block.timestamp + _stakingCooldown;
+        _stakings[msg.sender].rewardCooldown = block.timestamp + _rewardCooldown;
 
-        emit Staked(amount, _stakingCooldowns[msg.sender]);
+        emit Staked(amount, _stakings[msg.sender].stakingCooldown);
     }
 
     function unstake() public {
-        require(_stakings[msg.sender] > 0, "No tokens to unstake");
-        require(_stakingCooldowns[msg.sender] <= block.timestamp, "It's too early");
+        require(_stakings[msg.sender].staking > 0, "No tokens to unstake");
+        require(_stakings[msg.sender].stakingCooldown <= block.timestamp, "It's too early");
 
-        uint256 staking = _stakings[msg.sender];
-        _stakings[msg.sender] = 0;
+        uint256 staking = _stakings[msg.sender].staking;
+        _stakings[msg.sender].staking = 0;
         _stakingToken.transfer(msg.sender, staking);
         emit Unstaked(staking);
     }
 
     function claim() public {
-        require(_rewardCooldowns[msg.sender] <= block.timestamp, "It's too early");
-        require(_stakings[msg.sender] > 0, "No tokens staked");
+        require(_stakings[msg.sender].rewardCooldown <= block.timestamp, "It's too early");
+        require(_stakings[msg.sender].staking > 0, "No tokens staked");
 
-        uint256 reward = _stakings[msg.sender] * _percentage / 100;
+        uint256 reward = _stakings[msg.sender].staking * _percentage / 100;
         _rewardToken.transferFrom(_owner, msg.sender, reward);
-        _rewardCooldowns[msg.sender] = block.timestamp + _rewardCooldown;
+        _stakings[msg.sender].rewardCooldown = block.timestamp + _rewardCooldown;
         emit Claimed(reward);
     }
 

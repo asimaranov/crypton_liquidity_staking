@@ -17,7 +17,6 @@ contract Staking {
     uint256 private _rewardCooldown;
 
     mapping(address => uint256) private _stakings;
-
     mapping(address => uint256) private _stakingCooldowns;
     mapping(address => uint256) private _rewardCooldowns;
 
@@ -48,6 +47,7 @@ contract Staking {
         uint256 staking = _stakings[msg.sender];
         _stakings[msg.sender] = 0;
         _stakingToken.transfer(msg.sender, staking);
+
         emit Unstaked(staking);
     }
 
@@ -58,6 +58,7 @@ contract Staking {
         uint256 reward = _stakings[msg.sender] * _percentage / 100;
         _rewardToken.transferFrom(_owner, msg.sender, reward);
         _rewardCooldowns[msg.sender] = block.timestamp + _rewardCooldown;
+
         emit Claimed(reward);
     }
 
@@ -77,7 +78,6 @@ contract Staking {
         _percentage = 20;
         _stakingToken = IERC20(stakingToken); // 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67
         _rewardToken = IERC20(rewardToken);  //  0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6
-
         _stakingCooldown = 20 minutes;
         _rewardCooldown = 10 minutes;
         _owner = msg.sender;

@@ -5,8 +5,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Staking {
-
-    struct Stake{
+    struct Stake {
         uint256 staking;
         uint256 stakingCooldown;
         uint256 rewardCooldown;

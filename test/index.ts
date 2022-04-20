@@ -1,7 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { expect, use } from "chai";
-import { assert } from "console";
-import { BigNumber, Contract } from "ethers";
+import { expect } from "chai";
+import { Contract } from "ethers";
 import { ethers, network } from "hardhat";
 
 describe("Staking", function () {
@@ -16,17 +15,15 @@ describe("Staking", function () {
   const defaultRewardCooldown = 10 * 60;
   const defaultPercentage = 20;
 
-
   this.beforeEach(async () => {
     const FakeTokenContract = await ethers.getContractFactory("FakeToken");
 
     stakingTokenContract = await FakeTokenContract.deploy();
     rewardTokenContract = await FakeTokenContract.deploy();
-    
+
     const StakingContract = await ethers.getContractFactory("Staking");
     stakingContract = await StakingContract.deploy(stakingTokenContract.address, rewardTokenContract.address);
-    
-    
+
     [owner, user1] = await ethers.getSigners();
 
     await stakingTokenContract.deployed();
@@ -39,7 +36,6 @@ describe("Staking", function () {
     stakingContract = stakingContract.connect(user1);
     stakingTokenContract = stakingTokenContract.connect(user1);
     rewardTokenContract = rewardTokenContract.connect(user1);
-
   })
 
   it("Check fail on zero coin staking", async function () {
@@ -57,7 +53,7 @@ describe("Staking", function () {
   });
 
   it("Check that user cant get reward if haven't deposited any tokens", async function () {
-    await expect(stakingContract.claim()).to.be.revertedWith("No reward to claim");
+    await expect(stakingContract.claim()).to.be.revertedWith("No tokens staked");
   });
 
   it("Check that user cant get reward during cooldown", async function () {
@@ -65,7 +61,7 @@ describe("Staking", function () {
     await stakingContract.stake(stakingAmont);
     await expect(stakingContract.claim()).to.be.revertedWith("It's too early");
   });
-              
+
   it("Check that user can unstake after cooldown", async function () {
     await stakingTokenContract.approve(stakingContract.address, stakingAmont);
     const initialBalance = await stakingTokenContract.balanceOf(user1.address);
@@ -93,9 +89,6 @@ describe("Staking", function () {
 
     expect(amount).to.be.equal(stakingAmont);
     expect(until.toNumber()).to.be.greaterThan(Date.now() / 1000);
-    expect(pendingReward).to.be.equal(stakingAmont * defaultPercentage / 100);
-    expect(rewardAvailableAt.toNumber()).to.be.greaterThan(Date.now() / 1000);    
-
   });
 
   it("Check Unstaked event correctness", async function () {
@@ -120,7 +113,6 @@ describe("Staking", function () {
     expect(amount).to.be.equal(stakingAmont);
   });
 
-
   it("Check that user can get reward after cooldown", async function () {
     await stakingTokenContract.approve(stakingContract.address, stakingAmont);
 
@@ -137,6 +129,56 @@ describe("Staking", function () {
     const rewardAfterClaim = await rewardTokenContract.balanceOf(user1.address);
 
     expect(rewardAfterClaim - initialReward).to.be.equal(stakingAmont * defaultPercentage / 100);
+  });
+
+  it("Check that user can get reward multiple times", async function () {
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+
+    const initialReward = await rewardTokenContract.balanceOf(user1.address);
+    await stakingContract.stake(stakingAmont);
+
+    const rewardAfterStake = await rewardTokenContract.balanceOf(user1.address);
+
+    expect(initialReward).to.equal(rewardAfterStake);
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    const rewardAfterClaim = await rewardTokenContract.balanceOf(user1.address);
+
+    expect(rewardAfterClaim - initialReward).to.be.equal(3 * stakingAmont * defaultPercentage / 100);
+  });
+
+  it("Check that user can get a correct reward after multiple staking", async function () {
+    await stakingTokenContract.approve(stakingContract.address, stakingAmont);
+
+    const initialReward = await rewardTokenContract.balanceOf(user1.address);
+    await stakingContract.stake(stakingAmont / 2);
+
+    const rewardAfterStake = await rewardTokenContract.balanceOf(user1.address);
+
+    expect(initialReward).to.equal(rewardAfterStake);
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    await stakingContract.stake(stakingAmont / 2); // Second stake
+
+    await network.provider.send("evm_increaseTime", [defaultRewardCooldown]); // Add 10 minutes
+    await stakingContract.claim();
+
+    const rewardAfterClaim = await rewardTokenContract.balanceOf(user1.address);
+
+    expect(rewardAfterClaim - initialReward).to.be.equal((1 + 1 + 2) * stakingAmont / 2 * defaultPercentage / 100);
   });
 
   it("Check that user can unstake after cooldown changed by owner", async function () {
@@ -176,7 +218,6 @@ describe("Staking", function () {
     const rewardAfterUnstake = await rewardTokenContract.balanceOf(user1.address);
     expect(rewardAfterUnstake > initialReward);
   });
-
 
   it("Check percentage changing", async function () {
     const newPrecentage = 10;

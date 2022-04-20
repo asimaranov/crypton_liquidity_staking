@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 
 task("claim", "Claim tokens")
-    .addParam("contractAddr", "Address of the deployed staking contract", "0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6")
+    .addParam("contractAddr", "Address of the deployed staking contract", "0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c")
 
     .setAction(async (taskArgs, hre) => {
 

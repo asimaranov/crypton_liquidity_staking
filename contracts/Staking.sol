@@ -16,12 +16,11 @@ contract Staking {
     uint256 private _rewardCooldown;
 
     mapping(address => uint256) private _stakings;
-    mapping(address => uint256) private _rewards;
 
     mapping(address => uint256) private _stakingCooldowns;
     mapping(address => uint256) private _rewardCooldowns;
 
-    event Staked(uint256 amount, uint256 until, uint256 pendingReward, uint256 rewardAvailableAt);
+    event Staked(uint256 amount, uint256 until);
     event Unstaked(uint256 amount);
     event Claimed(uint256 amount);
 
@@ -32,33 +31,33 @@ contract Staking {
 
     function stake(uint256 amount) public {
         require(amount > 0, "Unable to stake 0 tokens");
+
         _stakingToken.transferFrom(msg.sender, address(this), amount);
         _stakings[msg.sender] += amount;
-        _rewards[msg.sender] += amount * _percentage / 100;
-
         _stakingCooldowns[msg.sender] = block.timestamp + _stakingCooldown;
         _rewardCooldowns[msg.sender] = block.timestamp + _rewardCooldown;
 
-        emit Staked(amount, _stakingCooldowns[msg.sender], _rewards[msg.sender], _rewardCooldowns[msg.sender]);
+        emit Staked(amount, _stakingCooldowns[msg.sender]);
     }
 
     function unstake() public {
         require(_stakings[msg.sender] > 0, "No tokens to unstake");
         require(_stakingCooldowns[msg.sender] <= block.timestamp, "It's too early");
 
-        _stakingToken.transfer(msg.sender, _stakings[msg.sender]);
-        emit Unstaked(_stakings[msg.sender]);
+        uint256 staking = _stakings[msg.sender];
         _stakings[msg.sender] = 0;
+        _stakingToken.transfer(msg.sender, staking);
+        emit Unstaked(staking);
     }
 
     function claim() public {
-        require(_rewards[msg.sender] > 0, "No reward to claim");
         require(_rewardCooldowns[msg.sender] <= block.timestamp, "It's too early");
+        require(_stakings[msg.sender] > 0, "No tokens staked");
 
-        _rewardToken.transferFrom(_owner, msg.sender, _rewards[msg.sender]);
-        emit Claimed(_rewards[msg.sender]);
-        _rewards[msg.sender] = 0;
-        
+        uint256 reward = _stakings[msg.sender] * _percentage / 100;
+        _rewardToken.transferFrom(_owner, msg.sender, reward);
+        _rewardCooldowns[msg.sender] = block.timestamp + _rewardCooldown;
+        emit Claimed(reward);
     }
 
     function setPercentage(uint256 percentage) public forOwner{

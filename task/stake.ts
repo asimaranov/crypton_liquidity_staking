@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 
 task("stake", "Stake tokens")
-    .addParam("contractAddr", "Address of the deployed staking contract", "0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6")
+    .addParam("contractAddr", "Address of the deployed staking contract", "0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c")
     .addParam("tokenAddr", "Address of token", "0xf1C80DE1bb14aC337808A83b0e56A53425D72B67")
     .addParam("tokenAmount", "Amount of token", "0.0000000001")
 

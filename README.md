@@ -33,11 +33,11 @@ npx hardhat addLiquidityEth --contract-addr 0x533f0f27029bB7A5713F5896CD55219DF4
 Contract addresses:
  - Rinkeby: `0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6`
 
-Verification: https://rinkeby.etherscan.io/address/0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6#code
+Verification: https://rinkeby.etherscan.io/address/0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c#code
 
 How to verify:
 ```shell
-npx hardhat verify 0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6 --network rinkeby 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67 0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6
+npx hardhat verify 0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c --network rinkeby 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67 0xc8eeF11F258158d2B9981DD4cE305eACF33Bf8b6
 ```
 
 How to deploy:
@@ -47,15 +47,15 @@ npx hardhat run scripts/deploy_staking.ts --network rinkeby
 
 How to stake: 
 ```shell
-npx hardhat stake --contract-addr 0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6 --token-addr 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67 --token-amount 0.0000000001 --network rinkeby
+npx hardhat stake --contract-addr 0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c --token-addr 0xf1C80DE1bb14aC337808A83b0e56A53425D72B67 --token-amount 0.0000000001 --network rinkeby
 ```
 
 How to unstake: 
 ```shell
-npx hardhat unstake --contract-addr 0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6 --network rinkeby
+npx hardhat unstake --contract-addr 0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c --network rinkeby
 ```
 
 How to claim: 
 ```shell
-npx hardhat claim --contract-addr 0x091319EC612ab0CF15Ba09A8627fF0967fDD98B6 --network rinkeby
+npx hardhat claim --contract-addr 0x06812Bc5aeC72685a599354FEEc0e4f2BE8B042c --network rinkeby
 ```

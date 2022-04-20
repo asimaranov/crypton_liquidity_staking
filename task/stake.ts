@@ -14,12 +14,10 @@ task("stake", "Stake tokens")
         const rc = await stakingTransaction.wait();
         const stakedEvent = rc.events!.find(e => e.event == 'Staked');
 
-        const [amount, until, pendingReward, rewardAvailableAt] = stakedEvent!.args!;
-        
-        console.log(
-            `Successfully staked ${hre.ethers.utils.formatEther(amount)} tokens until ${new Date(until * 1000).toLocaleString()}.\n` +
-            `Pending reward: ${hre.ethers.utils.formatEther(pendingReward)}, available at ${new Date(rewardAvailableAt * 1000).toLocaleString()}`
-            );
+        const [amount, until] = stakedEvent!.args!;
 
+        console.log(
+            `Successfully staked ${hre.ethers.utils.formatEther(amount)} tokens until ${new Date(until * 1000).toLocaleString()}.\n`
+        );
     });
 

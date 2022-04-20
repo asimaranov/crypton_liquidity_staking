@@ -6,8 +6,6 @@ async function main() {
 
   await addLiquidityContract.deployed();
 
-  
-
   console.log("Contract deployed to:", addLiquidityContract.address);
 }
 

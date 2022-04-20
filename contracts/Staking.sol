@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-import "./interfaces/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Staking {
     IERC20 private _stakingToken;
@@ -25,6 +25,10 @@ contract Staking {
     event Unstaked(uint256 amount);
     event Claimed(uint256 amount);
 
+    modifier forOwner {
+        require(msg.sender == _owner, "Only owner can do that");
+        _;
+    }
 
     function stake(uint256 amount) public {
         require(amount > 0, "Unable to stake 0 tokens");
@@ -57,11 +61,6 @@ contract Staking {
         
     }
 
-    modifier forOwner {
-        require(msg.sender == _owner, "Only owner can do that");
-        _;
-    }
-
     function setPercentage(uint256 percentage) public forOwner{
         _percentage = percentage;
     }
@@ -73,7 +72,6 @@ contract Staking {
     function setRewardCooldown(uint256 rewardCooldown) public forOwner{
         _rewardCooldown = rewardCooldown;
     }
-
 
     constructor(address stakingToken, address rewardToken) {
         _percentage = 20;
